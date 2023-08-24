@@ -3,6 +3,7 @@ package migrations
 import (
 	"fmt"
 	database "github.com/KowalskiPiotr98/gotabase"
+	"strings"
 )
 
 var (
@@ -15,12 +16,18 @@ var (
 			currentMigration)
 	}
 	LatestMigrationSelectorSql = "select id from migrations order by id desc limit 1"
+	IsInitialMigrationError    = func(err error) bool {
+		return strings.HasPrefix(err.Error(), "pq: relation") && strings.HasSuffix(err.Error(), "does not exist")
+	}
 )
 
 func Migrate(connector database.Connector, fileProvider MigrationFileProvider) error {
 	latestApplied, err := getLatestAppliedMigration(connector)
 	if err != nil {
-		return err
+		if !IsInitialMigrationError(err) {
+			return err
+		}
+		latestApplied = -1
 	}
 
 	latestAvailable, err := getLatestAvailableMigration(fileProvider)

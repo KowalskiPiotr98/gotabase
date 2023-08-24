@@ -21,7 +21,7 @@ You can execute migrations by calling the `Migrate` method in the `migrations` p
 
 There are a couple of important things to remember:
 1. You should store your migrations in a file with `.sql` extension. These files should be contained in a folder called `sql`. The files should have names consisting of a single number, starting at 0 and going **SEQUENTIALLY** up (as in `0.sql`, `1.sql`, `2.sql`...). If you need to remove a migration after a next number has been used, leave the file empty instead of removing it.
-2. Your database model must, from the very beginning, include a migrations table (it **MUST** be created in your `0.sql` migration file). By default, it should contain a single integer column called `id` as a primary key. Note that this behaviour can be modified or adjusted to a different DBMS by overwriting the `MigrationCreator` and `LatestMigrationSelectorSql` variables of the `migrations` package.
+2. Your database model must, from the very beginning, include a migrations table (it **MUST** be created in your `0.sql` migration file). By default, it should contain a single integer column called `id` as a primary key. Note that this behaviour can be modified or adjusted to a different DBMS by overwriting the `MigrationCreator`, `IsInitialMigrationError` and `LatestMigrationSelectorSql` variables of the `migrations` package.
 3. The interface for providing database migrations files must be implemented, as there's no default implementation. You can, however, use the `embed.FS` struct, as it fulfills the conditions of this interface. See below for more details.
 
 #### Usage of `embed.FS` as migration provider
