@@ -46,6 +46,7 @@ func Migrate(connector database.Connector, fileProvider MigrationFileProvider) e
 		if err != nil {
 			return err
 		}
+		currentMigration++
 	}
 	return nil
 }
