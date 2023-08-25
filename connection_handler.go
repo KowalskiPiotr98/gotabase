@@ -52,6 +52,11 @@ func InitialiseConnection(connectionString string, driver string) error {
 	if err != nil {
 		return err
 	}
+	err = database.Ping()
+	if err != nil {
+		database.Close()
+		return err
+	}
 
 	connection = &connectionHandler{
 		database: database,
