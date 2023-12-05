@@ -72,6 +72,18 @@ func GetConnection() Connector {
 	return connection
 }
 
+func BeginTransaction() (*Transaction, error) {
+	if connection == nil {
+		panic("database connection not initialised")
+	}
+
+	tx, err := connection.database.Begin()
+	if err != nil {
+		return nil, err
+	}
+	return newTransaction(tx), nil
+}
+
 func CloseConnection() error {
 	if connection == nil {
 		return nil
