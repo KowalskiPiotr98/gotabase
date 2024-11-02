@@ -3,6 +3,7 @@ package gotabase
 import (
 	"database/sql"
 	"errors"
+	"github.com/KowalskiPiotr98/gotabase/logger"
 )
 
 var connection *connectionHandler
@@ -48,16 +49,20 @@ func InitialiseConnection(connectionString string, driver string) error {
 		return connectionAlreadyInitialised
 	}
 
+	logger.LogInfo("Initialising database connection...")
 	database, err := sql.Open(driver, connectionString)
 	if err != nil {
+		logger.LogWarn("Failed to open database connection: %v", err)
 		return err
 	}
 	err = database.Ping()
 	if err != nil {
+		logger.LogWarn("Failed to ping database: %v", err)
 		database.Close()
 		return err
 	}
 
+	logger.LogInfo("Database connection established")
 	connection = &connectionHandler{
 		database: database,
 	}
@@ -66,7 +71,7 @@ func InitialiseConnection(connectionString string, driver string) error {
 
 func GetConnection() Connector {
 	if connection == nil {
-		panic("database connection not initialised")
+		logger.LogPanic(connectionNotInitialisedErr.Error())
 	}
 
 	return connection
@@ -74,11 +79,12 @@ func GetConnection() Connector {
 
 func BeginTransaction() (*Transaction, error) {
 	if connection == nil {
-		panic("database connection not initialised")
+		logger.LogPanic(connectionNotInitialisedErr.Error())
 	}
 
 	tx, err := connection.database.Begin()
 	if err != nil {
+		logger.LogWarn("Failed to begin transaction: %v", err)
 		return nil, err
 	}
 	return newTransaction(tx), nil
@@ -90,6 +96,7 @@ func CloseConnection() error {
 	}
 
 	if err := connection.database.Close(); err != nil {
+		logger.LogWarn("Failed to close database connection: %v", err)
 		return err
 	}
 	connection = nil

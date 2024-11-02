@@ -36,3 +36,11 @@ var (
 ```
 This will embed the contents of the `sql` directory in your output binary file, making it easy to distribute those files.
 You can also use the `migrations` variable in place of the provider interface.
+
+### Logging
+
+This library logs certain errors and information into a logger.
+By default, Logrus is used as a logger.
+This can be overwritten by assigning custom values to variables in `logger` package.
+
+Note that calling `LogPanic` expects the system to panic afterward, as not doing so might lead to unexpected results.

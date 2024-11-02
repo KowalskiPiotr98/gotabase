@@ -3,6 +3,7 @@ package migrations
 import (
 	"fmt"
 	database "github.com/KowalskiPiotr98/gotabase"
+	"github.com/KowalskiPiotr98/gotabase/logger"
 	"strings"
 )
 
@@ -25,13 +26,16 @@ func Migrate(connector database.Connector, fileProvider MigrationFileProvider) e
 	latestApplied, err := getLatestAppliedMigration(connector)
 	if err != nil {
 		if !IsInitialMigrationError(err) {
+			logger.LogWarn("Unable to get latest applied migration: %v", err)
 			return err
 		}
 		latestApplied = -1
 	}
 
 	latestAvailable, err := getLatestAvailableMigration(fileProvider)
+	logger.LogInfo("Latest applied migration: %d, latest available migration: %d", latestApplied, latestAvailable)
 	if latestApplied == latestAvailable {
+		logger.LogInfo("Latest migration is already applied, nothing to do.")
 		return nil
 	}
 
@@ -42,12 +46,15 @@ func Migrate(connector database.Connector, fileProvider MigrationFileProvider) e
 			return err
 		}
 
+		logger.LogInfo("Applying migration %d", currentMigration)
 		_, err = connector.Exec(MigrationCreator(migrationSql, currentMigration))
 		if err != nil {
+			logger.LogWarn("Unable to execute migration %d: %v", currentMigration, err)
 			return err
 		}
 		currentMigration++
 	}
+	logger.LogInfo("All pending migrations applied.")
 	return nil
 }
 
