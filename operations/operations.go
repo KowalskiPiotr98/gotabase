@@ -35,24 +35,20 @@ func QueryRow[T any](connector gotabase.Connector, scanner func(row gotabase.Row
 // CreateRowWithId creates a new data in the database.
 // The query is expected to return a new id, that will be set in the object using the HasIdSetter interface method.
 func CreateRowWithId[TId any, T HasIdSetter[TId]](connector gotabase.Connector, object T, query string, args ...any) error {
-	row, err := connector.QueryRow(query, args...)
-	if err != nil {
-		return Errors.HandleError(err)
-	}
-
-	var id TId
-	if err := row.Scan(&id); err != nil {
-		logger.LogWarn("Failed to scan new object id: %v", err)
-		return Errors.HandleError(err)
-	}
-	object.SetId(id)
-
-	return nil
+	return CreateRowWithScan(connector, object, func(row gotabase.Row, object T) error {
+		var id TId
+		if err := row.Scan(&id); err != nil {
+			logger.LogWarn("Failed to scan new object id: %v", err)
+			return Errors.HandleError(err)
+		}
+		object.SetId(id)
+		return nil
+	}, query, args...)
 }
 
 // CreateRowWithScan creates a new data in the database.
 // The query is expected to return a row, that will match the provided scanner function.
-func CreateRowWithScan[T any](connector gotabase.Connector, object *T, scanner func(row gotabase.Row, object *T) error, query string, args ...any) error {
+func CreateRowWithScan[T any](connector gotabase.Connector, object T, scanner func(row gotabase.Row, object T) error, query string, args ...any) error {
 	row, err := connector.QueryRow(query, args...)
 	if err != nil {
 		return Errors.HandleError(err)
