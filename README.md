@@ -44,3 +44,8 @@ By default, Logrus is used as a logger.
 This can be overwritten by assigning custom values to variables in `logger` package.
 
 Note that calling `LogPanic` expects the system to panic afterward, as not doing so might lead to unexpected results.
+
+### Operations
+
+The `operations` package offers a set of functions typically used in repositories, when using databases.
+When using those functions, errors returned can be controlled by setting relevant fields in the `Errors` object.
