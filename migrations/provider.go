@@ -3,6 +3,7 @@ package migrations
 import (
 	"errors"
 	"fmt"
+	"github.com/KowalskiPiotr98/gotabase/logger"
 	"slices"
 	"strconv"
 	"strings"
@@ -23,6 +24,7 @@ func getLatestAvailableMigration(migrations MigrationFileProvider) (int, error) 
 func getMigrationSql(migrations MigrationFileProvider, i int) (string, error) {
 	fileBytes, err := migrations.ReadFile(fmt.Sprintf("sql/%d.sql", i))
 	if err != nil {
+		logger.LogWarn("Unable to read migration file: %v", err)
 		return "", migrationNotFound
 	}
 	return string(fileBytes), nil
@@ -31,6 +33,7 @@ func getMigrationSql(migrations MigrationFileProvider, i int) (string, error) {
 func getAvailableMigrations(migrations MigrationFileProvider) (*[]int, error) {
 	dirContents, err := migrations.ReadDir("sql")
 	if err != nil {
+		logger.LogWarn("Unable to read migration directory: %v", err)
 		return nil, migrationNotFound
 	}
 
@@ -39,6 +42,7 @@ func getAvailableMigrations(migrations MigrationFileProvider) (*[]int, error) {
 		nameString := strings.TrimPrefix(strings.TrimSuffix(file.Name(), ".sql"), "sql/")
 		nameInt, err := strconv.Atoi(nameString)
 		if err != nil {
+			logger.LogWarn("Unable to parse migration file name: %v", err)
 			return nil, err
 		}
 		available = append(available, nameInt)
