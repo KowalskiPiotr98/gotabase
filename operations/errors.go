@@ -65,7 +65,7 @@ func (config *errorConfig) RegisterDefaultPostgresHandlers() {
 		}
 		// this handles foreign keys errors
 		var pgErr *pq.Error
-		if errors.As(err, &pgErr) && pgErr.Code == "23503" {
+		if errors.As(err, &pgErr) && (pgErr.Code == "23503" || pgErr.Code == "23001") {
 			// needs check to see what kind of FK error is this
 			if pgErr.Constraint != "" && strings.Contains(pgErr.Message, "update or delete") {
 				return config.DataUsedErr
