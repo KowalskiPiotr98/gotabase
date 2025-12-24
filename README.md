@@ -1,3 +1,7 @@
+# MIGRATION ANNOUNCEMENT
+WARNING - this repo was migrated to [GitLab](https://gitlab.com/KowalskiPiotr98/gotabase) - please update your package imports.
+No further updates will be published in this repository.
+
 # gotabase
 A simple database connection and migration handler for go applications.
 It has 2 primary applications:
